@@ -1,0 +1,16 @@
+user-config.py
+passwords.txt
+pywikibot-PeriodicEditor.lwp
+throttle.ctrl
+apicache/
+
+__pycache__/
+*.pyc
+
+
+venv/
+.env/
+.venv/
+
+.DS_Store
+Thumbs.db
