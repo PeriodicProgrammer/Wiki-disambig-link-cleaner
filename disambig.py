@@ -8,6 +8,9 @@ site.login()
 def clear():
     print("\033c", end="")
 
+def get_short_description(page_text):
+    return re.search(r"\{\{short description\s*\|([^\}]+)}}", page_text).group(1)
+
 def get_targets(page):
     items = []
     for line in page.text.splitlines():
@@ -47,8 +50,8 @@ for disambig in walk_category(root_cat):
     print()
     # Get all pages linking to this disambiguation page
     for page in disambig.getReferences(namespaces=[0]):  # mainspace only
-        print(page.title)
-        print(page.short_description)
+        print(str(page.title()))
+        print(f"Short description: {get_short_description(page.text)}")
         print(get_section_with_link(page, disambig))
         option = input("Enter option: ")
         print()
