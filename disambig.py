@@ -1,7 +1,12 @@
 import pywikibot
+from pywikibot import textlib
 import re
+
 site = pywikibot.Site('en', 'wikipedia')
 site.login()
+
+def clear():
+    print("\033c", end="")
 
 def get_targets(page):
     items = []
@@ -26,11 +31,27 @@ def walk_category(cat):
     for subcat in cat.subcategories():
         yield from walk_category(subcat)
 
+def get_section_with_link(page, target_title):
+    data = textlib.extract_sections(page.text, page.site)
+    for sec in data:
+        # Check if the link appears in this section
+        if re.search(r"\[\[([^\]\|]+)[^\]\|]*\]\]", sec):
+                return sec
+    return None
+
 for disambig in walk_category(root_cat):
     print("Disambiguation page:", disambig.title())
     targets = get_targets(disambig)
     for key, value in targets.items():
         print(f"{key}: {value}")
+    print()
     # Get all pages linking to this disambiguation page
     for page in disambig.getReferences(namespaces=[0]):  # mainspace only
-        print("  ->", page.title())
+        print(page.title)
+        print(page.short_description)
+        print(get_section_with_link(page, disambig))
+        option = input("Enter option: ")
+        print()
+        if option == "skip":
+            clear()
+            break
