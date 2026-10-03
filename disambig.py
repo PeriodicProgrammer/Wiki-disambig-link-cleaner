@@ -1,6 +1,7 @@
 import pywikibot
 from pywikibot import textlib
 import re
+import colours
 
 site = pywikibot.Site('en', 'wikipedia')
 site.login()
@@ -42,12 +43,12 @@ def get_section_with_link(page, target_title):
     data = textlib.extract_sections(page.text, page.site)
     for sec in data:
         # Check if the link appears in this section
-        if re.search(r"\[\[([^\]\|]+)[^\]\|]*\]\]", sec):
+        if re.search(fr"\[\[([^\]\|]+)[^\]\|]*\]\]", sec):
                 return sec
     return None
 
 for disambig in walk_category(root_cat):
-    print("Disambiguation page:", disambig.title())
+    print(f"Disambiguation page: {colours.DISAMBIG_LINK}{disambig.title()}{colours.RESET}")
     targets = get_targets(disambig)
     for key, value in targets.items():
         print(f"{key}: {value}")
@@ -57,8 +58,13 @@ for disambig in walk_category(root_cat):
         print(f"={page.title()}=")
         short_desc = get_short_description(page.text)
         if short_desc is not None:
-            print(f"Short description: {short_desc}")
-        print(get_section_with_link(page, disambig))
+            print(f"Short description: {colours.SHORT_DESC}{short_desc}{colours.RESET}")
+        section = get_section_with_link(page, disambig)
+        new = re.sub(fr"\[\[{re.escape(disambig.title())}\s*(\|?)([^\]]*)\]\]", fr"{colours.DISAMBIG_LINK}[[{disambig.title()}\1\2]]{colours.RESET}", section)
+        if section == new:
+            print("Error")
+        else:
+            print(new)
         option = input("Enter option: ")
         print()
         if option == "skip":
